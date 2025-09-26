@@ -52,6 +52,17 @@ class GestorArchivos:
             "correo_electronico" : correo_persona
         }
         
+        
+        with open("gestion_basica.json", "r") as datos_json:
+            datos_gestion = json.load(datos_json)
+        
+        if datos_json is not None:
+            for persona in datos_gestion["personas"]:
+                if datos_nuevos["codigo"] == persona["codigo"]:
+                    print("NO SE PUEDE REGISTRAR, YA EXISTE DICHO CODIGO")
+                    return
+                else:
+                    print("no se encontró nada, es posible guardar")
         #Lo guardamos en el diccionario de GestorArchivos, NO FUNCIONA????
         GestorArchivos.datos_persona["personas"].append(datos_nuevos)
         
@@ -185,6 +196,8 @@ class GestorArchivos:
                     
             else:
                 print("No se encontró")
+    
+    
     
 GestorArchivos.cargar_archivos()    
 GestorArchivos.Menu()
