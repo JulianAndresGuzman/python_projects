@@ -152,6 +152,13 @@ class GestorArchivos:
                     datos_gestion = json.load(datos_json)
             except FileNotFoundError:
                 print("No se ha podido cargar")
+                return
+            except json.JSONDecodeError:
+                print("No se ha podido cargar el archivo")
+                return
+            
+        if datos_gestion["personas"] is None:
+                return
         for persona in datos_gestion["personas"]:
             print(f"Id:", persona["codigo"], " Nombre:", persona["nombre"], " Correo electrónico:", persona["correo_electronico"], " Numero telefonico:", persona["numero_telefonico"])
             
