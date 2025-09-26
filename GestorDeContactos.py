@@ -90,9 +90,11 @@ class GestorArchivos:
         for persona in datos_gestion["personas"]:
             print(f"id:", persona["codigo"], "Nombre: ", persona["nombre"], " Correo electrónico: ", persona["correo_electronico"], " Numero telefonico: ", persona["numero_telefonico"])
             
+            input()
+            
             if not datos_gestion.get("personas"):
                 print("NO HAY DATOS QUE MOSTRAR")
-            
+                input()
             
     #La lógica principal del menú        
     @staticmethod
@@ -108,6 +110,8 @@ class GestorArchivos:
             
             if seleccion == 1:
                 GestorArchivos.IngresarDatos()
+            if seleccion ==2:
+                GestorArchivos.borrar_datos()
             elif seleccion == 3:
                 GestorArchivos.MostrarDatos()
             elif seleccion == 4:
@@ -177,7 +181,8 @@ class GestorArchivos:
         dato_seleccionado = int(input())
         for persona in datos_gestion["personas"]:
             if dato_seleccionado == int(persona["codigo"]):
-                                        
+                
+                
                 print("Ingresa el nombre de la persona:")
                 persona["nombre"] = input()
                     
@@ -197,7 +202,33 @@ class GestorArchivos:
             else:
                 print("No se encontró")
     
-    
-    
+    @staticmethod
+    def borrar_datos(datos_gestion = None):
+        
+        if datos_gestion is None:
+            try:
+                with open("gestion_basica.json", "r") as datos_json:
+                    datos_gestion = json.load(datos_json)
+            except FileNotFoundError:
+                print("No se ha podido cargar")
+                return
+            except json.JSONDecodeError:
+                print("No se ha podido cargar el archivo")
+                return
+            
+        if datos_gestion["personas"] is None:
+                return
+        for persona in datos_gestion["personas"]:
+            print(f"Id:", persona["codigo"], " Nombre:", persona["nombre"], " Correo electrónico:", persona["correo_electronico"], " Numero telefonico:", persona["numero_telefonico"])
+            
+        print("Selecciona la id, de dato que quieras eliminar:")
+        dato_seleccionado = int(input())
+        for i, persona in enumerate(datos_gestion["personas"]):
+            if dato_seleccionado == int(persona["codigo"]):
+                del datos_gestion["personas"][i]
+                
+                with open("gestion_basica.json", "w") as datos_json:
+                    json.dump(datos_gestion, datos_json)
+                
 GestorArchivos.cargar_archivos()    
 GestorArchivos.Menu()
