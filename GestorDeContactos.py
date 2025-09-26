@@ -1,0 +1,183 @@
+
+#Lianjuh
+
+#Intentar desarrollar un sistema básico de contactos, guardar en json, leer en json, poder editarlo y poder borrarlo.
+#Nombre
+#Número télefono
+#Correo Électrónico
+
+#Importamos la liberería de json
+
+import json
+
+class GestorArchivos:
+    datos_persona = {
+        "personas" : []
+    }
+    
+    @staticmethod
+    #Creamos la función para mostrar el menú
+    def MostrarMenu():
+        menu = """
+        1. Ingresar Datos
+        2. Borrar Datos
+        3. Mostrar Datos
+        4. Editar datos
+        5. Formatear todos los datos
+        6. Salir
+        """
+        print(menu)
+    
+    #Creamos la función para ingresar los datos y guardarlos en el json
+    @staticmethod
+    def IngresarDatos():
+        
+        print("Ingresa el codigo Para la persona:")
+        codigo_persona = input()
+        
+        print("Ingresa el nombre de la persona:")
+        nombre_persona = input()
+        
+        print("Ingresa el número télefonico de la persona:")
+        numero_telefonico_persona = input()
+        
+        print("Ingresa el correo électrónico de la persona:")
+        correo_persona = input()
+        
+        #Creamos un diccionario para guardar los datos
+        datos_nuevos = {
+            "codigo" : codigo_persona,
+            "nombre" : nombre_persona,
+            "numero_telefonico": numero_telefonico_persona,
+            "correo_electronico" : correo_persona
+        }
+        
+        #Lo guardamos en el diccionario de GestorArchivos, NO FUNCIONA????
+        GestorArchivos.datos_persona["personas"].append(datos_nuevos)
+        
+        
+        #Tratar de crear y guardar los datos en el archivo json
+        with open("gestion_basica.json", "w") as datos_json:
+            json.dump(GestorArchivos.datos_persona, datos_json, indent=4)
+        
+        with open("gestion_basica.json", "r") as datos_json:
+            datos = json.load(datos_json)
+            GestorArchivos.MostrarDatos(datos)
+            
+    #Mostrar datos en el menú, aunque ya lo hace al guardar datos
+    @staticmethod
+    def MostrarDatos(datos_gestion = None):
+        
+        if datos_gestion is None:
+            try:
+                with open("gestion_basica.json", "r") as datos_json:
+                    datos_gestion = json.load(datos_json)
+            except FileNotFoundError:
+                print("No se ha guardado ningún archivo")
+                return
+                    
+        for persona in datos_gestion["personas"]:
+            print(f"id:", persona["codigo"], "Nombre: ", persona["nombre"], " Correo electrónico: ", persona["correo_electronico"], " Numero telefonico: ", persona["numero_telefonico"])
+            
+            if not datos_gestion.get("personas"):
+                print("NO HAY DATOS QUE MOSTRAR")
+            
+            
+    #La lógica principal del menú        
+    @staticmethod
+    def Menu():
+        while True:
+            GestorArchivos.MostrarMenu()
+            try:
+                print("Porfavor seleccione una opción")
+                seleccion = int(input())
+            except ValueError:
+                print("porfavor seleccione un número valido")
+                continue
+            
+            if seleccion == 1:
+                GestorArchivos.IngresarDatos()
+            elif seleccion == 3:
+                GestorArchivos.MostrarDatos()
+            elif seleccion == 4:
+                GestorArchivos.modificar_archivos()
+            elif seleccion == 5:
+                GestorArchivos.formatear_datos()
+            elif seleccion == 6:
+                print("Saliendo del programa...")
+                break
+    
+    @staticmethod
+    #Para formatear absolutamente todos los datos, tanto en la variable como el json
+    def formatear_datos():
+        print("¿Estás seguro de querer borrar todos los datos?")
+        print("si/no")
+        confirmacion = input()
+        
+        if confirmacion.lower() in ["si", "yes", "y", "s"]:
+            GestorArchivos.datos_persona = {
+                "personas" : []
+            }
+            with open("gestion_basica.json", "w") as datos_json:
+                json.dump(GestorArchivos.datos_persona, datos_json, indent=4)
+                print("Datos borrados exitosamente")
+        
+        else:
+            print("operacion Cancelada")
+        
+    #Parece que no carga los archivos antes de ser guardados nuevamente??
+    #Ya se solucionó, parece que simplemente se debió crear esta función antes de escribir otro archivo
+    @staticmethod
+    def cargar_archivos():
+            try:
+                with open("gestion_basica.json", "r") as datos_json:
+                    GestorArchivos.datos_persona = json.load(datos_json)
+            except FileNotFoundError:
+                GestorArchivos.datos_persona = {
+                    "personas" : []
+                }
+            except json.JSONDecodeError:
+                GestorArchivos.datos_persona = {
+                    "personas" : []
+                }
+    
+    
+    #Intento desarrollar una función para que me ayude a buscar y actualizar
+    @staticmethod
+    def modificar_archivos(datos_gestion = None):
+        
+        if datos_gestion is None:
+            try:
+                with open("gestion_basica.json", "r") as datos_json:
+                    datos_gestion = json.load(datos_json)
+            except FileNotFoundError:
+                print("No se ha podido cargar")
+        for persona in datos_gestion["personas"]:
+            print(f"Id:", persona["codigo"], " Nombre:", persona["nombre"], " Correo electrónico:", persona["correo_electronico"], " Numero telefonico:", persona["numero_telefonico"])
+            
+        print("Selecciona la id, de dato que quieras cambiar:")
+        dato_seleccionado = int(input())
+        for persona in datos_gestion["personas"]:
+            if dato_seleccionado == int(persona["codigo"]):
+                                        
+                print("Ingresa el nombre de la persona:")
+                persona["nombre"] = input()
+                    
+                print("Ingresa el número télefonico de la persona:")
+                persona["numero_telefonico"] = input()
+                    
+                print("Ingresa el correo électrónico de la persona:")
+                persona["correo_electronico"] = input()
+                    
+                try:
+                    with open("gestion_basica.json", "w") as datos_json:
+                        json.dump(datos_gestion, datos_json)
+                except:
+                    print("error, no se pudo guardar correctamente")
+                    return
+                    
+            else:
+                print("No se encontró")
+    
+GestorArchivos.cargar_archivos()    
+GestorArchivos.Menu()
